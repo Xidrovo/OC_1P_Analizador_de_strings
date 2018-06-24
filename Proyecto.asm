@@ -12,20 +12,21 @@
 .text
 
 main:
+    addi $t5,$0,32 		#Guarda el caracter de espacio.
     li $t1,0			#Inicializamos nuestro contador que va a estar en $t1 con el valor de 0
     la $t0,message		#Guardamos el primer valor del texto en el registro
 
 #	jal contadorLetras	#Llamo a la función
+#	jal contadorPalabras	#Llamo a la función
+ #   la      $s2,str1 	#Seteamos la dirección de 80 bytes a s2
+ #   move    $t2,$s2		#Movemos el registro de S2 a T2
+ #   jal     getstr		#Llmamos a la función getStr
 
-    la      $s2,str1 	#Seteamos la dirección de 80 bytes a s2
-    move    $t2,$s2		#Movemos el registro de S2 a T2
-    jal     getstr		#Llmamos a la función getStr
-
-    la      $s3,str2	#Seteamos la dirección de 80 bytes a s3
-    move    $t2,$s3		#Movemos el registro de S3 a T2
-    jal     getstr		#Llamamos a la función getStr
+ #   la      $s3,str2	#Seteamos la dirección de 80 bytes a s3
+ #   move    $t2,$s3		#Movemos el registro de S3 a T2
+ #   jal     getstr		#Llamamos a la función getStr
     
-    jal cmploop
+  #  jal cmploop
 	jal exit
 	
 contadorLetras:
@@ -34,11 +35,30 @@ contadorLetras:
     addi $t0,$t0,1		#Añade uno al registro de nuestro texto (ir al caracter siguiente)
     addi $t1,$t1,1		#Añade uno a nuestro contador que va a ser guardado en $t1
     j    contadorLetras #Repite el loop
+
+contadorPalabras:
+    lb   $a0,0($t0)		#Cargamos un byte del registro $t0 (Nuestro texto), lo que sería la primera letra
+    beqz $a0, fin2 		#Si encuentra que es un valor nulo, se salta a la función de fin.
+    beq $a0, $t5, contarPalabra	# Si encuentra un espacio, cuenta la palabra
+    addi $t0,$t0,1		#Añade uno al registro de nuestro texto (ir al caracter siguiente)
+    j  contadorPalabras	 	#Repite el loop
         
+contarPalabra:
+    addi $t1,$t1,1		#Añade uno a nuestro contador que va a ser guardado en $t1
+    addi $t0,$t0,1		#Añade uno al registro de nuestro texto (ir al caracter siguiente)
+    j  contadorPalabras		#Repite el loop
+                        
+                                                                        
 fin:					#Cuando ya se termine se ejecuta esta funcion
     li   $v0,1			#Instruccion para imprimir un Integer (nuestro contador)
-    add  $a0, $0,$t1	#Añadir el valor de nuestro contador al registro que se va a imprimir
+    add  $a0, $0,$t1		#Añadir el valor de nuestro contador al registro que se va a imprimir
     syscall				#Ejecuta imprimir el valor del contador
+
+fin2:				#Cuando ya se termine se ejecuta esta funcion
+    li   $v0,1			#Instruccion para imprimir un Integer (nuestro contador)
+    addi $t1, $t1, 1		#Añade uno al contador
+    add  $a0, $0,$t1		#Añadir el valor de nuestro contador al registro que se va a imprimir
+    syscall			#Ejecuta imprimir el valor del contador
 
 getstr:
    	la      $a0,mensaje	#Imprimimos el mensaje al usuario

@@ -13,6 +13,6 @@ Proyecto de primer parcial de Organización por computadores
 ## Ejemplos con comparaciones al lenguaje C
 >https://courses.cs.washington.edu/courses/cse378/03wi/lectures/mips-asm-examples.html
 
-###Creadores
-@xidrovo
-@jguilindro
+#### Creadores
+@xidrovo    - Xavier Idrovo
+@jguilindro - Julio Guilindro

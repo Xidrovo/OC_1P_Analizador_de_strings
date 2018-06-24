@@ -1,5 +1,5 @@
 .data
-	menu:		.asciiz "\n--------------\n\nAnalizador de strings\n\n>1. Comparar strings \n>2. Calcular tamaño \n>3. Calcular letras \n>4. Fin \n-------------------------\nEscoja: "
+	menu:		.asciiz "\n--------------\n\nAnalizador de strings\n\n>1. Comparar strings \n>2. Calcular tamaño (numero de caracteres) \n>3. Calcular numero de palabras \n>4. Fin \n-------------------------\nEscoja: "
     message: 	.asciiz	"Hello darkness my old friend" #Texto a leer
     
 	mensaje:    .asciiz     "Ingrese la palabra ( ingrese '.' para terminar) > "
@@ -24,7 +24,7 @@ main:
 	
 	beq $t0,1,compararStrings	#Opción 1
 	beq $t0,2,contarLetras		#Opción 2
-	beq $t0,3,contadorPalabras	#Opción 3
+	beq $t0,3,contarPalabras	#Opción 3
 
 	jal exit
 

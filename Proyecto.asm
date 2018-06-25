@@ -1,13 +1,13 @@
 .data
 	menu:		.asciiz "\n--------------\n\nAnalizador de strings\n\n>1. Comparar strings \n>2. Calcular tamaño (numero de caracteres) \n>3. Calcular numero de palabras \n>4. Obtener caracter mayor \n>5. Obtener caracter menor \n>6. Salir\n-------------------------\nEscoja: "
-    message: 	.asciiz	"Hello darkness my old friend" #Texto a leer
+    	#message: 	.asciiz	"Hello darkness my old friend" #Texto a leer
     
 	mensaje:    .asciiz     "Ingrese la palabra ( ingrese '.' para terminar) > "
 	dot:        .asciiz     "."
 	enter:		.asciiz		"\n"
 	eqmsg:      .asciiz     "Palabras son iguales!\n"
 	nemsg:      .asciiz     "Palabras no son iguales!\n"
-
+	message: .space  200
 	str1:       .space      80
 	str2:       .space      80
 .text
@@ -41,80 +41,94 @@ compararStrings:
 	jal cmploop
 
 contarLetras:
-    addi $t5,$0,32 			#Guarda el caracter de espacio.
     li $t1,0				#Inicializamos nuestro contador que va a estar en $t1 con el valor de 0
+    jal     obtenerStr			#Llmamos a la función getStr
     la $t2,message			#Guardamos el primer valor del texto en el registro
     jal contadorLetras
     
 contarPalabras:
-	addi $t5,$0,32 			#Guarda el caracter de espacio.
+    addi $t5,$0,32 			#Guarda el caracter de espacio.
     li $t1,0				#Inicializamos nuestro contador que va a estar en $t1 con el valor de 0
+    jal     obtenerStr			#Llmamos a la función getStr
     la $t2,message			#Guardamos el primer valor del texto en el registro
     jal contadorPalabras
     
 contadorLetras:
-    lb   $a0,0($t2)				#Cargamos un byte del registro $t0 (Nuestro texto), lo que sería la primera letra
-    beqz $a0, letrasContadas 	#Si encuentra que es un valor nulo, se salta a la función de fin.
-    addi $t2,$t2,1				#Añade uno al registro de nuestro texto (ir al caracter siguiente)
-    addi $t1,$t1,1				#Añade uno a nuestro contador que va a ser guardado en $t1
+    lb   $a0,0($t2)			#Cargamos un byte del registro $t0 (Nuestro texto), lo que sería la primera letra
+    beqz $a0, letrasContadas 		#Si encuentra que es un valor nulo, se salta a la función de fin.
+    blt  $a0, 32, letrasContadas 	#Si encuentra un caracter de control se salta a la función de fin.
+    addi $t2,$t2,1			#Añade uno al registro de nuestro texto (ir al caracter siguiente)
+    addi $t1,$t1,1			#Añade uno a nuestro contador que va a ser guardado en $t1
     j    contadorLetras 		#Repite el loop
 
 contadorPalabras:
-    lb   $a0,0($t2)					#Cargamos un byte del registro $t0 (Nuestro texto), lo que sería la primera letra
+    lb   $a0,0($t2)			#Cargamos un byte del registro $t0 (Nuestro texto), lo que sería la primera letra
     beqz $a0, palabrasContadas 		#Si encuentra que es un valor nulo, se salta a la función de fin.
+    blt  $a0, 32, palabrasContadas 	#Si encuentra un caracter de control se salta a la función de fin.
     beq $a0, $t5, contarPalabra		# Si encuentra un espacio, cuenta la palabra
-    addi $t2,$t2,1					#Añade uno al registro de nuestro texto (ir al caracter siguiente)
-    j  contadorPalabras	 			#Repite el loop
+    addi $t2,$t2,1			#Añade uno al registro de nuestro texto (ir al caracter siguiente)
+    j  contadorPalabras	 		#Repite el loop
         
 contarPalabra:
-    addi $t1,$t1,1		#Añade uno a nuestro contador que va a ser guardado en $t1
-    addi $t2,$t2,1		#Añade uno al registro de nuestro texto (ir al caracter siguiente)
-    j  contadorPalabras	#Repite el loop
+    addi $t1,$t1,1			#Añade uno a nuestro contador que va a ser guardado en $t1
+    addi $t2,$t2,1			#Añade uno al registro de nuestro texto (ir al caracter siguiente)
+    j  contadorPalabras			#Repite el loop
                                                                          
-letrasContadas:			#Cuando ya se termine se ejecuta esta funcion
-    li   $v0,1			#Instruccion para imprimir un Integer (nuestro contador)
-    add  $a0, $0,$t1	#Añadir el valor de nuestro contador al registro que se va a imprimir
+letrasContadas:				#Cuando ya se termine se ejecuta esta funcion
+    li   $v0,1				#Instruccion para imprimir un Integer (nuestro contador)
+    add  $a0, $0,$t1			#Añadir el valor de nuestro contador al registro que se va a imprimir
     syscall				#Ejecuta imprimir el valor del contador
     jal main
 
 palabrasContadas:			#Cuando ya se termine se ejecuta esta funcion
     li   $v0,1				#Instruccion para imprimir un Integer (nuestro contador)
-    addi $t1, $t1, 1		#Añade uno al contador
-    add  $a0, $0,$t1		#Añadir el valor de nuestro contador al registro que se va a imprimir
-    syscall					#Ejecuta imprimir el valor del contador
+    addi $t1, $t1, 1			#Añade uno al contador
+    add  $a0, $0,$t1			#Añadir el valor de nuestro contador al registro que se va a imprimir
+    syscall				#Ejecuta imprimir el valor del contador
 	jal main
 	
 getstr:
-   	la      $a0,mensaje	#Imprimimos el mensaje al usuario
-    li      $v0,4		# :)
+    la      $a0,mensaje			#Imprimimos el mensaje al usuario
+    li      $v0,4			# Syscall imprimir mensaje
     syscall				#se imprime ''
 
-    move    $a0,$t2		# Movemos el registro a un argumento a0
-    li      $a1,79		# :)
-    li      $v0,8		# indica que el sistema leerá un string
+    move    $a0,$t2			# Movemos el registro a un argumento a0
+    li      $a1,79			# Valor máximo de string que vamos a ingresar
+    li      $v0,8			# indica que el sistema leerá un string
     syscall
 
-    jr      $ra          # return
+    jr      $ra          		# return
+    
+obtenerStr:
+    la      $a0,mensaje			#Imprimimos el mensaje al usuario
+    li      $v0,4			# Syscall imprimir mensaje
+    syscall				#se imprime ''
 
+    la    $a0, message			# Guardamos input a message
+    li      $a1,79			# Valor máximo de string que vamos a ingresar
+    li      $v0,8			# indica que el sistema leerá un string
+    syscall
+
+    jr      $ra         		 # return
 # funcionará como strcmp
 cmploop:
-    lb      $t2,($s2)		#obtenemos el siguiente char de str1
-    lb      $t3,($s3)		# obtenemos el siguiente char de str2
-    bne     $t2,$t3,cmpne   # Si son diferentes, llama al procedure cmpne (comparison not equal)
+    lb      $t2,($s2)			#obtenemos el siguiente char de str1
+    lb      $t3,($s3)			# obtenemos el siguiente char de str2
+    bne     $t2,$t3,cmpne   		# Si son diferentes, llama al procedure cmpne (comparison not equal)
 
-    beq     $t2,$zero,cmpeq # si son iguales, llama a cmpeq (Comparison equal)
+    beq     $t2,$zero,cmpeq		 # si son iguales, llama a cmpeq (Comparison equal)
 
-    addi    $s2,$s2,1 		# apuntamos al siguiente caracter
-    addi    $s3,$s3,1       # apuntamos al siguiente caracter
+    addi    $s2,$s2,1 			# apuntamos al siguiente caracter
+    addi    $s3,$s3,1       		# apuntamos al siguiente caracter
     j       cmploop
 
-cmpne:						#Si los strings no son iguales
+cmpne:					#Si los strings no son iguales
     la      $a0,nemsg
     li      $v0,4
     syscall
 	jal main
 	
-cmpeq:						#Si los strings son iguales
+cmpeq:					#Si los strings son iguales
     la      $a0,eqmsg
     li      $v0,4
     syscall
@@ -128,11 +142,11 @@ cmpeq:						#Si los strings son iguales
  	jal caracterMayor
  	
 caracterMayor:
-    lb      $t2,($s4)						#obtenemos el siguiente char de str1
+    lb      $t2,($s4)			#obtenemos el siguiente char de str1
     beq     $t2,$zero,finDeBusqueda 	
-    addi	$a0, $t2, 0						#cast t2 a int en a0
+    addi	$a0, $t2, 0		#cast t2 a int en a0
     addi    $s4,$s4,1 						#Apuntamos al siguiente caracter
-	blt 	$t4, $a0, guardarMayorValor		#if t4 < a0, then llama a guardarMayorValor
+    blt 	$t4, $a0, guardarMayorValor		#if t4 < a0, then llama a guardarMayorValor
     j 		caracterMayor
     
 guardarMayorValor:

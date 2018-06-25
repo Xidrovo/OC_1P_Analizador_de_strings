@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-int compare(char* first, char* second);
+char* compare(char* first, char* second);
 int compareChar(char a, char b);
 int numPalabras( char* oracion );
 int length( char* palabra );
@@ -10,7 +10,7 @@ char letraMasPequena( char* palabra );
 int main()
 {
 
-    printf( "%i \n", compare("ads", " a sdasdasd") );
+    printf( "%s \n", compare("ads", "ads") );
     printf( "%i \n", numPalabras( "   La oracion está   al " ) );
     printf( "%i \n", length( "palabra" ) );
     printf( "%c \n", letraMasGrande("abcdefghijklmnopqrsteuvwxyz") );
@@ -21,7 +21,7 @@ int main()
 //Devuelve positivo si first > second
 //Devuelve -negativo si first < second
 //Devuelve 0 si son iguales
-int compare( char* first, char* second ) {
+char* compare( char* first, char* second ) {
     char* Fptr = first;
     char* Sptr = second;
     int tempComparator = 0;
@@ -29,13 +29,13 @@ int compare( char* first, char* second ) {
     while( *Fptr != '\0' && *Sptr != '\0' ){
         tempComparator = compareChar( *Fptr, *Sptr );
         if ( tempComparator != 0 ){
-            return tempComparator;
+            return "Las palabras son diferentes!";
         }
         Fptr++;
         Sptr++;
     }
     
-    return 0;
+    return "Las palabras son iguales!";
 }
 //Devuelve positivo si a > b
 //Devuelve negativo si a < b
@@ -102,5 +102,3 @@ char letraMasPequena( char* palabra ){
     }
     return (char) menor;
 }
-
-
